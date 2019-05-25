@@ -19,27 +19,28 @@ import java.util.concurrent.TimeUnit;
 public class Ex3B {
 	public static void main(String[] args) {
 		int num = 1000; 
-		System.out.println("countLinesThread : ");
+		System.out.println("Count lines Threads : ");
 		countLinesThread(num);
+
 		System.out.println("**********************");
-		System.out.println("countLinesOneProcess : ");
+		System.out.println("Count lines One Process : ");
 		countLinesOneProcess(num);
-		/**/
+
 		System.out.println("**********************");
-		System.out.println("countLinesThreadPool : ");
-	
+		System.out.println("Count lines ThreadPool : ");
 		countLinesThreadPool(num);
+		/**/
 	}
 	/**
 	 * 
 	 * @param n amount of files to create
 	 * @return an array of files name
-	 * this function create files, and write inside ramdom of lines "Hello World"  
+	 * this function create files, and write inside random of lines "Hello World"  
 	 */
 	public static String[] createFiles(int n) {
 		Random r = new Random(123); 
 		String files[]=new String [n];
-		int sum=0;
+		//int sum=0;
 		try {
 			for(int i=0;i<n;i++) {
 				files[i]="File_"+(i+1);
@@ -47,13 +48,13 @@ public class Ex3B {
 				file.createNewFile();
 				BufferedWriter bw = new BufferedWriter(new FileWriter(files[i])); 
 				int numLines = r.nextInt(1000);
-				sum+=numLines;
+				//sum+=numLines;
 				for(int j=0;j<numLines;j++) {
 					bw.write("Hello World");
 					bw.newLine();
 				}
 				bw.close();
-			}System.out.println("sum of lines expected : "+sum);
+			}//System.out.println("sum of lines expected : "+sum);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -92,16 +93,24 @@ public class Ex3B {
 	public static void countLinesThread (int numFiles)   {
 		try {
 			int sum=0;
-			String files[]=createFiles(numFiles);
+			String files[]=createFiles(numFiles);	
+			long begin=System.currentTimeMillis();
 			LineCounter counters[]=new LineCounter[numFiles];
-			double begin=System.currentTimeMillis();
 			for (int i = 0; i < numFiles; i++) {
 				counters[i]=new LineCounter(files[i]);
 				counters[i].start();
-				counters[i].join();
+			}
+			while(true) {
+				int sum2=0;
+				for(int i=0;i<counters.length;i++) {
+					if(!counters[i].isAlive())sum2++;
+				}
+				if(sum2==counters.length)break;
+			}
+			for(int i=0;i<counters.length;i++) {
 				sum+=counters[i].line_num;
 			}
-			double run_time=System.currentTimeMillis()-begin;
+			long run_time=System.currentTimeMillis()-begin;
 			System.out.println("sum of lines is: "+sum);
 			System.out.println("run time is: "+run_time+" in Millis");
 			deleteFiles(files);
@@ -109,7 +118,8 @@ public class Ex3B {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}	
+
 	/**
 	 * 
 	 * @param num
@@ -123,20 +133,16 @@ public class Ex3B {
 		try {
 			int sum=0;
 			String files[]=Ex3B.createFiles(num);
-			double begin=System.currentTimeMillis();
-			//code
-			ExecutorService pool=Executors.newFixedThreadPool(num);
+			long begin=System.currentTimeMillis();
+			ExecutorService pool=Executors.newFixedThreadPool(num/8);
 			for(int i=0;i<num;i++) {
 				LineCounter_Callable a = new LineCounter_Callable((files[i]));
 				Future<Integer> answer=pool.submit(a);
-				//System.out.println(answer.get());
 				sum+=answer.get();
 			}
-			double run_time=System.currentTimeMillis()-begin;
+			long run_time=System.currentTimeMillis()-begin;
 			System.out.println("sum of lines is: "+sum);
 			System.out.println("run time is: "+run_time+" in Millis");
-			//TimeUnit.SECONDS.sleep(120);
-
 			Ex3B.deleteFiles(files);
 			pool.shutdown();
 
@@ -154,12 +160,12 @@ public class Ex3B {
 	 * 
 	 */
 	public static void countLinesOneProcess(int num) {
+		long run_time=0;
 		try {
 			int sum =0;
-			double begin=System.currentTimeMillis();
 			String files[]=Ex3B.createFiles(num);
 			try {
-
+				long begin=System.currentTimeMillis();
 				for(int i=0;i<num;i++) {
 					FileReader fr = new FileReader(files[i]);  
 					BufferedReader br = new BufferedReader(fr); 
@@ -174,7 +180,7 @@ public class Ex3B {
 						sum=sum+j-1;
 					}
 					br.close();
-				}
+				} run_time=System.currentTimeMillis()-begin;
 			}
 			catch(Exception e) {
 
@@ -182,7 +188,7 @@ public class Ex3B {
 			}
 
 			//code
-			double run_time=System.currentTimeMillis()-begin;
+
 			System.out.println("sum of lines is: "+sum);
 			System.out.println("run time is: "+run_time+" in Millis");
 

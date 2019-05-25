@@ -1,3 +1,8 @@
+/**
+ * 
+ * @author בנימין דרמוני
+ *This class using as a timer, verify that the dead line not pass
+ */
 public class Timer extends Thread {
 	double maxTime;
 	public void run() throws RuntimeException{

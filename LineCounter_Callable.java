@@ -1,7 +1,11 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.concurrent.Callable;
-
+/**
+ * 
+ * @author בנימין דרמוני
+ *this class count the lines number in a file using thread
+ */
 public class LineCounter_Callable implements Callable<Integer> {
 	String name;
 	int line_num;
@@ -30,7 +34,7 @@ public class LineCounter_Callable implements Callable<Integer> {
 
 			e.getStackTrace();
 		}
-		//System.out.println(line_num);
+
 		return line_num;
 
 

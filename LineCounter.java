@@ -1,7 +1,10 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.concurrent.atomic.AtomicInteger;
-
+/**
+ * @author בנימין דרמוני
+ *this class count the lines number in a file using thread
+ */
 public class LineCounter extends Thread {
 	String name;
 	int line_num;
